@@ -73,7 +73,9 @@ def loadKNNDataAndTrainKNN():
 ###################################################################################################
 def detectCharsInPlates(listOfPossiblePlates):
     intPlateCounter = 0
-    imgContours = np.zeros((height, width, 3), np.uint8)
+
+    imgContours = None
+
     contours = []
 
     if len(listOfPossiblePlates) == 0:
@@ -242,9 +244,9 @@ def findPossibleCharsInPlate(imgGrayscale, imgThresh):
 
 ###################################################################################################
 def checkIfPossibleChar(possibleChar):
-    if (possibleChar.boundingRect.area() > MIN_PIXEL_AREA and
-        possibleChar.boundingRect.width > MIN_PIXEL_WIDTH and possibleChar.boundingRect.height > MIN_PIXEL_HEIGHT and
-        MIN_ASPECT_RATIO < possibleChar.dblAspectRatio and possibleChar.dblAspectRatio < MAX_ASPECT_RATIO):
+    if (possibleChar.intBoundingRectArea > MIN_PIXEL_AREA and
+        possibleChar.intBoundingRectWidth > MIN_PIXEL_WIDTH and possibleChar.intBoundingRectHeight > MIN_PIXEL_HEIGHT and
+        MIN_ASPECT_RATIO < possibleChar.fltAspectRatio and possibleChar.fltAspectRatio < MAX_ASPECT_RATIO):
         return True
     else:
         return False
@@ -366,10 +368,40 @@ def removeInnerOverlappingChars(listOfMatchingChars):
 def recognizeCharsInPlate(imgThresh, listOfMatchingChars):
     strChars = ""               # this will be the return value, the chars in the lic plate
 
+    height, width, numChannels = imgThresh.shape
 
+    imgThreshColor = np.zeros((height, width, 3), np.uint8)
 
+    listOfMatchingChars.sort(key = lambda matchingChar: matchingChar.intCenterX)        # sort chars from left to right
 
+    cv2.cvtColor(imgThresh, cv2.COLOR_GRAY2BGR, imgThreshColor)
 
+    for currentChar in listOfMatchingChars:
+        pt1 = tuple(currentChar.boundingRect.x, currentChar.boundingRect.y)
+        pt2 = tuple((currentChar.boundingRect.x + currentChar.boundingRect.width), (currentChar.boundingRect.y + currentChar.boundingRect.height))
+
+        cv2.rectangle(imgThreshColor, pt1, pt2, Main.SCALAR_GREEN, 2)
+
+        imgROI = imgThresh[currentChar.boundingRect.y : currentChar.boundingRect.y + currentChar.boundingRect.height,
+                           currentChar.boundingRect.x : currentChar.boundingRect.x + currentChar.boundingRect.width]
+
+        imgROIResized = cv2.resize(imgROI, (RESIZED_CHAR_IMAGE_WIDTH, RESIZED_CHAR_IMAGE_HEIGHT))
+
+        npaROIResized = imgROIResized.reshape((1, RESIZED_IMAGE_WIDTH * RESIZED_IMAGE_HEIGHT))
+
+        npaROIResized = np.float32(npaROIResized)
+
+        retval, npaResults, neigh_resp, dists = kNearest.findNearest(npaROIResized, k = 1)              # finally we can call findNearest !!!
+
+        strCurrentChar = str(chr(int(npaResults[0][0])))
+
+        strChars = strChars + strCurrentChar                        # append current char to full string
+
+    # end for
+
+    if Main.showSteps == True:
+        cv2.imshow("10", imgThreshColor)
+    # end if
 
     return strChars
 # end function

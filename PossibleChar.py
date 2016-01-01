@@ -2,6 +2,7 @@
 
 import cv2
 import numpy as np
+import math
 
 ###################################################################################################
 class PossibleChar:
@@ -12,12 +13,21 @@ class PossibleChar:
 
         self.boundingRect = cv2.boundingRect(self.contour)
 
-        self.intCenterX = (self.boundingRect.x + self.boundingRect.x + self.boundingRect.width) / 2
-        self.intCenterY = (self.boundingRect.y + self.boundingRect.y + self.boundingRect.height) / 2
+        [intX, intY, intWidth, intHeight] = self.boundingRect
 
-        self.fltDiagonalSize = sqrt((boundingRect.width ** 2) + (boundingRect.height ** 2))
+        self.intBoundingRectX = intX
+        self.intBoundingRectY = intY
+        self.intBoundingRectWidth = intWidth
+        self.intBoundingRectHeight = intHeight
 
-        self.fltAspectRatio = boundingRect.width / boundingRect.height
+        self.intBoundingRectArea = self.intBoundingRectWidth * self.intBoundingRectHeight
+
+        self.intCenterX = (self.intBoundingRectX + self.intBoundingRectX + self.intBoundingRectWidth) / 2
+        self.intCenterY = (self.intBoundingRectY + self.intBoundingRectY + self.intBoundingRectHeight) / 2
+
+        self.fltDiagonalSize = math.sqrt((self.intBoundingRectWidth ** 2) + (self.intBoundingRectHeight ** 2))
+
+        self.fltAspectRatio = self.intBoundingRectWidth / self.intBoundingRectHeight
     # end constructor
 
 # end class
