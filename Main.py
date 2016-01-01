@@ -47,7 +47,7 @@ def main():
                 # if we get in here vector of possible plates has at leat one plate
 
                 # sort the vector of possible plates in DESCENDING order (most number of chars to least number of chars)
-        listOfPossiblePlates.sort(key = lambda possiblePlate: len(possiblePlate.strChars), reversed = True)
+        listOfPossiblePlates.sort(key = lambda possiblePlate: len(possiblePlate.strChars), reverse = True)
 
                 # suppose the plate with the most recognized chars (the first plate in sorted by string length descending order) is the actual plate
         licPlate = listOfPossiblePlates[0]
@@ -81,12 +81,12 @@ def main():
 ###################################################################################################
 def drawRedRectangleAroundPlate(imgOriginalScene, licPlate):
 
-    cv2.boxPoints(licPlate.rrLocationOfPlateInScene, p2fRectPoints)
+    p2fRectPoints = cv2.boxPoints(licPlate.rrLocationOfPlateInScene)
 
-    cv2.line(imgOriginalScene, p2fRectPoints[0], p2fRectPoints[1], SCALAR_RED, 2)
-    cv2.line(imgOriginalScene, p2fRectPoints[1], p2fRectPoints[2], SCALAR_RED, 2)
-    cv2.line(imgOriginalScene, p2fRectPoints[2], p2fRectPoints[3], SCALAR_RED, 2)
-    cv2.line(imgOriginalScene, p2fRectPoints[3], p2fRectPoints[4], SCALAR_RED, 2)
+    cv2.line(imgOriginalScene, tuple(p2fRectPoints[0]), tuple(p2fRectPoints[1]), SCALAR_RED, 2)
+    cv2.line(imgOriginalScene, tuple(p2fRectPoints[1]), tuple(p2fRectPoints[2]), SCALAR_RED, 2)
+    cv2.line(imgOriginalScene, tuple(p2fRectPoints[2]), tuple(p2fRectPoints[3]), SCALAR_RED, 2)
+    cv2.line(imgOriginalScene, tuple(p2fRectPoints[3]), tuple(p2fRectPoints[0]), SCALAR_RED, 2)
 # end function
 
 ###################################################################################################
@@ -94,27 +94,36 @@ def writeLicensePlateCharsOnImage(imgOriginalScene, licPlate):
     ptCenterOfTextArea = Point.Point()
     ptLowerLeftTextOrigin = Point.Point()
 
-    intFontFace = cv2.FONT_HERSHEY_SIMPLEX
-    dblFontScale = float(licPlate.imgPlate.rows) / 30.0
-    intFontThickness = int(round(dblFontScale * 1.5))
-    intBaseline = 0
+    sceneHeight, sceneWidth, sceneNumChannels = imgOriginalScene.shape
+    plateHeight, plateWidth, plateNumChannels = licPlate.imgPlate.shape
 
-    textSize = cv2.getTextSize(licPlate.strChars, intFontFace, dblFontScale, intFontThickness)
+    intFontFace = cv2.FONT_HERSHEY_SIMPLEX
+    fltFontScale = float(plateHeight) / 30.0
+    intFontThickness = int(round(fltFontScale * 1.5))
+
+    textSize, baseline = cv2.getTextSize(licPlate.strChars, intFontFace, fltFontScale, intFontThickness)
 
     ptCenterOfTextArea = Point.Point()
 
-    ptCenterOfTextArea.x = int(licPlate.rrLocationOfPlateInScene.center.x)
+    ( (intPlateCenterX, intPlateCenterY), (intPlateWidth, intPlateHeight), fltCorrectionAngleInDeg ) = licPlate.rrLocationOfPlateInScene
 
-    if licPlate.rrLocationOfPlateInScene.center.y < (imgOriginalScene.rows * 0.75):
-        ptCenterOfTextArea.y = int(round(licPlate.rrLocationOfPlateInScene.center.y)) + int(round(licPlate.imgPlate.rows * 1.6))
+    intPlateCenterX = int(intPlateCenterX)
+    intPlateCenterY = int(intPlateCenterY)
+
+    ptCenterOfTextArea.x = int(intPlateCenterX)
+
+    if intPlateCenterY < (sceneHeight * 0.75):
+        ptCenterOfTextArea.y = int(round(intPlateCenterY)) + int(round(plateHeight * 1.6))
     else:
-        ptCenterOfTextArea.y = int(round(licPlate.rrLocationOfPlateInScene.center.y)) - int(round(licPlate.imgPlate.rows * 1.6))
+        ptCenterOfTextArea.y = int(round(intPlateCenterY)) - int(round(plateHeight * 1.6))
     # end if
 
-    ptLowerLeftTextOrigin.x = int(ptCenterOfTextArea.x - (textSize.width / 2))
-    ptLowerLeftTextOrigin.y = int(ptCenterOfTextArea.y + (textSize.height / 2))
+    textSizeWidth, textSizeHeight = textSize
 
-    cv2.putText(imgOriginalScene, licPlate.strChars, ptLowerLeftTextOrigin, intFontFace, dblFontScale, SCALAR_YELLOW, intFontThickness)
+    ptLowerLeftTextOrigin.x = int(ptCenterOfTextArea.x - (textSizeWidth / 2))
+    ptLowerLeftTextOrigin.y = int(ptCenterOfTextArea.y + (textSizeHeight / 2))
+
+    cv2.putText(imgOriginalScene, licPlate.strChars, (ptLowerLeftTextOrigin.x, ptLowerLeftTextOrigin.y), intFontFace, fltFontScale, SCALAR_YELLOW, intFontThickness)
 # end function
 
 ###################################################################################################

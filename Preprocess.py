@@ -28,7 +28,6 @@ def preprocess(imgOriginal):
 
 ###################################################################################################
 def extractValue(imgOriginal):
-
     height, width, numChannels = imgOriginal.shape
 
     imgHSV = np.zeros((height, width, 3), np.uint8)
@@ -53,8 +52,8 @@ def maximizeContrast(imgGrayscale):
     imgTopHat = cv2.morphologyEx(imgGrayscale, cv2.MORPH_TOPHAT, structuringElement)
     imgBlackHat = cv2.morphologyEx(imgGrayscale, cv2.MORPH_BLACKHAT, structuringElement)
 
-    imgGrayscalePlusTopHat = imgGrayscale + imgTopHat
-    imgGrayscalePlusTopHatMinusBlackHat = imgGrayscalePlusTopHat - imgBlackHat
+    imgGrayscalePlusTopHat = cv2.add(imgGrayscale, imgTopHat)
+    imgGrayscalePlusTopHatMinusBlackHat = cv2.subtract(imgGrayscalePlusTopHat, imgBlackHat)
 
     return imgGrayscalePlusTopHatMinusBlackHat
 # end function

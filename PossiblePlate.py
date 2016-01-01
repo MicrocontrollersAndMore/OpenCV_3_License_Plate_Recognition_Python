@@ -7,7 +7,7 @@ import numpy as np
 class PossiblePlate:
 
     # constructor #################################################################################
-    def __init__(self, name):
+    def __init__(self):
         self.imgPlate = None
         self.imgGrayscale = None
         self.imgThresh = None
