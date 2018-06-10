@@ -23,14 +23,14 @@ def main():
     blnKNNTrainingSuccessful = DetectChars.loadKNNDataAndTrainKNN()         # attempt KNN training
 
     if blnKNNTrainingSuccessful == False:                               # if KNN training was not successful
-        print "\nerror: KNN traning was not successful\n"               # show error message
+        print("\nerror: KNN traning was not successful\n")  # show error message
         return                                                          # and exit program
     # end if
 
-    imgOriginalScene  = cv2.imread("1.png")               # open image
+    imgOriginalScene  = cv2.imread("LicPlateImages/1.png")               # open image
 
     if imgOriginalScene is None:                            # if image was not read successfully
-        print "\nerror: image not read from file \n\n"      # print error message to std out
+        print("\nerror: image not read from file \n\n")  # print error message to std out
         os.system("pause")                                  # pause so user can see error message
         return                                              # and exit program
     # end if
@@ -42,7 +42,7 @@ def main():
     cv2.imshow("imgOriginalScene", imgOriginalScene)            # show scene image
 
     if len(listOfPossiblePlates) == 0:                          # if no plates were found
-        print "\nno license plates were detected\n"             # inform user no plates were found
+        print("\nno license plates were detected\n")  # inform user no plates were found
     else:                                                       # else
                 # if we get in here list of possible plates has at leat one plate
 
@@ -56,14 +56,14 @@ def main():
         cv2.imshow("imgThresh", licPlate.imgThresh)
 
         if len(licPlate.strChars) == 0:                     # if no chars were found in the plate
-            print "\nno characters were detected\n\n"       # show message
+            print("\nno characters were detected\n\n")  # show message
             return                                          # and exit program
         # end if
 
         drawRedRectangleAroundPlate(imgOriginalScene, licPlate)             # draw red rectangle around plate
 
-        print "\nlicense plate read from image = " + licPlate.strChars + "\n"       # write license plate text to std out
-        print "----------------------------------------"
+        print("\nlicense plate read from image = " + licPlate.strChars + "\n")  # write license plate text to std out
+        print("----------------------------------------")
 
         writeLicensePlateCharsOnImage(imgOriginalScene, licPlate)           # write license plate text on the image
 
