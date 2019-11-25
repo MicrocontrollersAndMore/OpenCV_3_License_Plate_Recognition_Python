@@ -130,7 +130,7 @@ def findPossibleCharsInScene(imgThresh):
 
     imgThreshCopy = imgThresh.copy()
 
-    imgContours, contours, npaHierarchy = cv2.findContours(imgThreshCopy, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)   # find all contours
+    contours, npaHierarchy = cv2.findContours(imgThreshCopy, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)   # find all contours
 
     height, width = imgThresh.shape
     imgContours = np.zeros((height, width, 3), np.uint8)
